@@ -66,7 +66,7 @@ import mclangHandler from "./minecraftLangfileHandler.ts";
 import celariaMapHandler from "./celariaMap.ts";
 import cybergrindHandler from "./cybergrindHandler.ts";
 import textToSourceHandler from "./textToSource.ts";
-import wabtHandler from "./wabt.ts";
+import wabtHandler from "./wabtHandler.ts";
 
 const handlers: FormatHandler[] = [];
 try { handlers.push(new svgTraceHandler()) } catch (_) { };
