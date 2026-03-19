@@ -67,6 +67,7 @@ import celariaMapHandler from "./celariaMap.ts";
 import cybergrindHandler from "./cybergrindHandler.ts";
 import textToSourceHandler from "./textToSource.ts";
 import wabtHandler from "./wabtHandler.ts";
+import xcursorHandler from "./xcursor.ts";
 
 const handlers: FormatHandler[] = [];
 try { handlers.push(new svgTraceHandler()) } catch (_) { };
@@ -142,5 +143,6 @@ try { handlers.push(new celariaMapHandler()) } catch (_) { };
 try { handlers.push(new cybergrindHandler()) } catch (_) { };
 try { handlers.push(new textToSourceHandler()) } catch (_) { };
 try { handlers.push(new wabtHandler()) } catch (_) { };
+try { handlers.push(new xcursorHandler()) } catch (_) { };
 
 export default handlers;
