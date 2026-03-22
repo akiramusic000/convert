@@ -16,13 +16,17 @@ export default class wabtHandler implements FormatHandler {
     const wasmModule = this.wabtModule!.readWasm(bytes, {});
     const str = wasmModule.toText({});
     const encoder = new TextEncoder();
-    return encoder.encode(str);
+    const encoded = encoder.encode(str);
+    wasmModule.destroy();
+    return encoded;
   }
 
   wat2wasm(filename: string, bytes: Uint8Array): Uint8Array {
     const wasmModule = this.wabtModule!.parseWat(filename, bytes);
     const outBytes = wasmModule.toBinary({});
-    return outBytes.buffer;
+    const buffer = outBytes.buffer;
+    wasmModule.destroy();
+    return buffer;
   }
 
   async init() {
