@@ -1,26 +1,29 @@
 import type { FileData, FileFormat, FormatHandler } from "../FormatHandler.ts";
-import { Category } from "src/CommonFormats.ts";
+import { Category } from "../CommonFormats.ts";
 import wabt from "wabt";
 
-const wabtModule = await wabt();
-
-function wasm2wat(bytes: Uint8Array): Uint8Array {
-  const wasmModule = wabtModule.readWasm(bytes, {});
-  const str = wasmModule.toText({});
-  const encoder = new TextEncoder();
-  return encoder.encode(str);
-}
-
-function wat2wasm(filename: string, bytes: Uint8Array): Uint8Array {
-  const wasmModule = wabtModule.parseWat(filename, bytes);
-  const outBytes = wasmModule.toBinary({});
-  return outBytes.buffer;
-}
+// WabtModule is not exported
+type WabtModule = Awaited<ReturnType<typeof wabt>>;
 
 export default class wabtHandler implements FormatHandler {
   public name: string = "wabt";
   public supportedFormats?: FileFormat[];
   public ready: boolean = false;
+
+  private wabtModule?: WabtModule;
+
+  wasm2wat(bytes: Uint8Array): Uint8Array {
+    const wasmModule = this.wabtModule!.readWasm(bytes, {});
+    const str = wasmModule.toText({});
+    const encoder = new TextEncoder();
+    return encoder.encode(str);
+  }
+
+  wat2wasm(filename: string, bytes: Uint8Array): Uint8Array {
+    const wasmModule = this.wabtModule!.parseWat(filename, bytes);
+    const outBytes = wasmModule.toBinary({});
+    return outBytes.buffer;
+  }
 
   async init() {
     this.supportedFormats = [
@@ -48,6 +51,9 @@ export default class wabtHandler implements FormatHandler {
         lossless: true,
       },
     ];
+
+    this.wabtModule = await wabt();
+
     this.ready = true;
   }
 
@@ -64,7 +70,7 @@ export default class wabtHandler implements FormatHandler {
           name:
             file.name.split(".").slice(0, -1).join(".") +
             `.${outputFormat.extension}`,
-          bytes: wasm2wat(file.bytes),
+          bytes: this.wasm2wat(file.bytes),
         });
       }
       return outputFiles;
@@ -76,7 +82,7 @@ export default class wabtHandler implements FormatHandler {
           name:
             file.name.split(".").slice(0, -1).join(".") +
             `.${outputFormat.extension}`,
-          bytes: wat2wasm(file.name, file.bytes),
+          bytes: this.wat2wasm(file.name, file.bytes),
         });
       }
       return outputFiles;
